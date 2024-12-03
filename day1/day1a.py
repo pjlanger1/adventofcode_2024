@@ -1,3 +1,6 @@
+import csv
+import re
+
 class AOC1aSol:
     def __init__(self, p):
         self.path = p
