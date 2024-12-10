@@ -1,59 +1,57 @@
 #day6a
-path = '/Users/peter/Downloads/aoc6a.txt'
-
 class AOC6aSol:
     def __init__(self, p):
         self.path = p
         self.board = []
-        self.pointer = 0
+        self.pointer = (0, 0)
         self.pointtype = '?'
-        self.tofind = ['<','>','^','v']
+        self.tofind = ['<', '>', '^', 'v']
         self.collen = 0
         self.rowlen = 0
-        self.pos = set()
-        
+        self.visited = set()
+
         with open(self.path, 'r') as f:
-            i = 0
-            for l in f.readlines():
-                self.board.append(list(l))
-                j = 0
-                for c in l:
+            for i, line in enumerate(f.readlines()):
+                row = list(line.strip('\n'))  
+                self.board.append(row)
+                for j, c in enumerate(row):
                     if c in self.tofind:
-                        self.pointer = (i,j) 
+                        self.pointer = (i, j)
                         self.pointtype = c
-                    j += 1
-                i += 1
-                
-        self.collen = len(self.board[0])
+                        
         self.rowlen = len(self.board)
-    
+        self.collen = len(self.board[0]) if self.rowlen > 0 else 0
+
     def movement(self):
-        turns = {'^':'>','>':'v','v':'<','<':'^'}
-        move = {'^':(-1,0),'>':(0,1),'v':(1,0),'<':(0,-1)}
         
-        nextmove = move[self.pointtype]
-        nextspace = (self.pointer[0]+nextmove[0],self.pointer[1]+nextmove[1])
+        turns = {'^': '>', '>': 'v', 'v': '<', '<': '^'}
+        move = {'^': (-1, 0), '>': (0, 1), 'v': (1, 0), '<': (0, -1)}
+
         
-        if nextspace[0] < 0 or nextspace[0] >= self.rowlen or nextspace[1] < 0 or nextspace[1] >= self.collen:
-            print('game over!')
-            self.pointer = (-1, -1)  
-            return
+        next_move = move[self.pointtype]
+        next_space = (self.pointer[0] + next_move[0], self.pointer[1] + next_move[1])
+
         
-        elif self.board[nextspace[0]][nextspace[1]] != '.':
-            self.pointtype = turns[self.pointtype]
+        if (next_space[0] < 0 or next_space[0] >= self.rowlen or
+                next_space[1] < 0 or next_space[1] >= self.collen):
+            return False  
+            #out of bounds, game over
+
         
+        if self.board[next_space[0]][next_space[1]] != '.':
+            self.pointtype = turns[self.pointtype]  
         else:
-            self.pointer = nextspace
-    
-    def gameover(self):
-        return self.pointer[0] < 0 or self.pointer[1] < 0
-    
+            self.pointer = next_space
+            self.visited.add(next_space)
+
+        return True 
+
     def solve(self):
-        while not self.gameover():
-            self.pos.add(self.pointer)
-            self.movement()
-        
-        return len(self.pos)
-            
-        
-            
+     
+        self.visited.add(self.pointer)
+
+       
+        while self.movement():
+            pass
+
+        return len(self.visited)
